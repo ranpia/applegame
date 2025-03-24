@@ -93,7 +93,7 @@ else:
     exit()
 
 # 🔠 OCR 실행
-os.system("python ocr_pipline.py")
+os.system("python dl_ocr_pipline.py")
 board = np.loadtxt("data/ocr_result_corrected_10x17.csv", delimiter=",", dtype=int)
 
 # 🎯 DQN 학습 시작

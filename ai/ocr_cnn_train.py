@@ -4,13 +4,13 @@ import torch.nn as nn
 import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
-from model.ocr_cnn import OCRCNN  # ✅ 외부 모델 불러오기
+from model.ocr_cnn import OCR_CNN  # ✅ 외부 모델 불러오기
 
 # 학습 환경
 data_dir = "data/ocr_data"
 save_path = "model/ocr_cnn.pth"
 batch_size = 32
-epochs = 15
+epochs = 30
 learning_rate = 0.001
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -27,7 +27,7 @@ dataset = datasets.ImageFolder(data_dir, transform=transform)
 loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 # 모델 불러오기
-model = OCRCNN().to(device)
+model = OCR_CNN(use_softmax=False).to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 

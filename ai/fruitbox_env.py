@@ -66,7 +66,7 @@ class FruitBoxEnv:
         self._detect_apples()
 
         # 5. OCR 파이프라인 실행
-        os.system("python ocr_pipline.py")
+        os.system("python dl_ocr_pipline.py")
         self.state = np.loadtxt("data/ocr_result_corrected_10x17.csv", delimiter=",", dtype=int)
 
         return self.state.copy()
@@ -81,7 +81,7 @@ class FruitBoxEnv:
         reward = 0
 
         if values.size > 0 and np.sum(values) == 10:
-            from drag_logic import drag_apples
+            from ai.utils.drag_logic import drag_apples
             positions = [self.center_grid[r, c] for r, c in indices]
             drag_apples(positions, self.driver)
             for r, c in indices:

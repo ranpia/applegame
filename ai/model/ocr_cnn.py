@@ -1,26 +1,33 @@
 import torch.nn as nn
-import torch.nn.functional as F
 
-class OCRCNN(nn.Module):
-    def __init__(self):
-        super(OCRCNN, self).__init__()
-        self.conv = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size=3, padding=1),  # (1, 32, 32) -> (32, 32, 32)
+class OCR_CNN(nn.Module):
+    def __init__(self, use_softmax=False):
+        super(OCR_CNN, self).__init__()
+        self.use_softmax = use_softmax
+        self.features = nn.Sequential(
+            nn.Conv2d(1, 32, 3, padding=1),  # 1x32x32 → 32x32x32
+            nn.BatchNorm2d(32),
             nn.ReLU(),
-            nn.MaxPool2d(2, 2),                         # (32, 32, 32) -> (32, 16, 16)
+            nn.MaxPool2d(2),  # → 32x16x16
 
-            nn.Conv2d(32, 64, kernel_size=3, padding=1), # -> (64, 16, 16)
+            nn.Conv2d(32, 64, 3, padding=1),
+            nn.BatchNorm2d(64),
             nn.ReLU(),
-            nn.MaxPool2d(2, 2),                         # -> (64, 8, 8)
+            nn.MaxPool2d(2)  # → 64x8x8
         )
-        self.fc = nn.Sequential(
-            nn.Linear(64 * 8 * 8, 128),  # 🔸여기 중요!
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(64 * 8 * 8, 128),
             nn.ReLU(),
-            nn.Linear(128, 10)  # 숫자 0~9 분류
+            nn.Dropout(0.3),
+            nn.Linear(128, 9)
         )
+        self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
-        x = self.conv(x)
-        x = x.view(x.size(0), -1)  # Flatten
-        x = self.fc(x)
+        x = self.features(x)
+        x = self.classifier(x)
+        if self.use_softmax:
+            return self.softmax(x)
         return x
+
